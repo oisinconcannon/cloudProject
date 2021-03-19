@@ -23,7 +23,15 @@ const [text, onChangeText] = React.useState(null);
 
       <View style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#778899' }}>
 
-        <Image source={{uri: 'https://scx2.b-cdn.net/gfx/news/hires/2019/weatherforec.jpg'}}
+      <TextInput
+              style={styles.input}
+              onChangeText={onChangeText}
+              value={text}
+              placeholder="Please Enter The Name Of The City"
+      />
+
+      
+      <Image source={{uri: 'https://scx2.b-cdn.net/gfx/news/hires/2019/weatherforec.jpg'}}
                style={{width: 400, height: 350}} />
         <Text style={{ margin: 10 ,color:'#000',padding: 5,backgroundColor: '#fff',borderColor: '#000', borderWidth: 2, borderRadius: 10}}>This App
 is designed to display weather for a current day or current week using Yahoo weather api.
