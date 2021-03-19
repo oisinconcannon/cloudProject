@@ -35,7 +35,7 @@ is designed to display weather for a current day or current week using Yahoo wea
       </View>
       <View style={{flexDirection:'row'}}>
       <View style={{ padding: 5, backgroundColor: '#FFFF33', marginBottom: 10, marginTop: 10, borderColor: '#fff', borderWidth: 2, borderRadius: 10, }} >
-      <Text style ={{fontSize:20}}onPress={() => navigation.navigate('ChartTheData')}>
+      <Text style ={{fontSize:20}}onPress={() => navigation.navigate('ChartTheDataToday')}>
       Search Weather
       </Text>
       </View>
@@ -92,6 +92,31 @@ function ChartTheData({ navigation, route }) {
     </View>
   );
 }
+
+function ChartTheDataToday({ navigation, route }) {
+ const [text, onChangeText] = React.useState(null);
+
+  return (
+    <View style={{ flex: 1,
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   backgroundColor: '#fff',
+                   paddingBottom: 50
+                 }}>
+      <View style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' }}>
+
+        <Image source={{uri: 'https://scx2.b-cdn.net/gfx/news/hires/2019/weatherforec.jpg'}}
+               style={{width: 400, height: 350}} />
+
+      </View>
+      <View style={{flexDirection:'row'}}>
+
+
+
+    </View>
+    </View>
+  );
+}
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -115,6 +140,22 @@ export default function App() {
         <Stack.Screen
           name="ChartTheData"
           component={ChartTheData}
+          options={{
+            title: 'Chart',
+            backgroundColor: '#1e90ff',
+            headerStyle: {
+              backgroundColor: '#000080',
+              height: 50,
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            }
+          }}
+        />
+        <Stack.Screen
+          name="ChartTheDataToday"
+          component={ChartTheDataToday}
           options={{
             title: 'Chart',
             backgroundColor: '#1e90ff',
