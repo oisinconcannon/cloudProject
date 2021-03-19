@@ -10,20 +10,25 @@ YellowBox.ignoreWarnings([ // https://reactnavigation.org/docs/troubleshooting/
 ]);
 
 function HomeScreen({ navigation, route }) {
-
-
+ const [text, onChangeText] = React.useState(null);
 
   return (
     <View style={{ flex: 1,
                    alignItems: 'center',
                    justifyContent: 'center',
-                   backgroundColor: '#778899',
+                   backgroundColor: '#fff',
                    paddingBottom: 50
                  }}>
-      <View style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#778899' }}>
+      <View style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' }}>
+      <TextInput
+        style={styles.input}
+        onChangeText={onChangeText}
+        value={text}
+        placeholder="Please Enter The Name Of The City"
+      />
         <Image source={{uri: 'https://scx2.b-cdn.net/gfx/news/hires/2019/weatherforec.jpg'}}
                style={{width: 400, height: 350}} />
-        <Text style={{ margin: 10 ,color:'#fff',padding: 5,backgroundColor: '#778899',borderColor: '#fff', borderWidth: 2, borderRadius: 10}}>This App
+        <Text style={{ margin: 10 ,color:'#000',padding: 5,backgroundColor: '#fff',borderColor: '#000', borderWidth: 2, borderRadius: 10}}>This App
 is designed to display weather for a current day or current week using Yahoo weather api.
         </Text>
 
@@ -50,13 +55,15 @@ function ChartTheData({ navigation, route }) {
   //  return null;
   //}
 
-  let lineData = {interpolation: 'T', data: [0, 5, 10, 15, 10, 5, 0, -5],
+  let lineData = {interpolation: 'T', data: [10, 12, 8, 9, 10, 5, 0, -5],
                   nativeData: {
-                    labels: ["January", "February", "March", "April", "May", "June"],
+                    labels: ["Mon", "Tue", "Wed", "Thurs", "Fri", "Sat","Sun"],
                     datasets: [
                     {
                       data: [
                         Math.random() * 90,
+                        Math.random() * 100,
+                        Math.random() * 100,
                         Math.random() * 100,
                         Math.random() * 100,
                         Math.random() * 100,
@@ -75,7 +82,7 @@ function ChartTheData({ navigation, route }) {
                    paddingBottom: 50
                  }}>
       <View style={{ backgroundColor: '#ffffff', borderColor: '#000000', borderWidth: 2, padding: 2 }} >
-        <MyChart dataToChart = {lineData} > </MyChart>
+        <MyChart dataToChart = {lineData}> </MyChart>
       </View>
       <View style={{ padding: 5, marginTop: 10, backgroundColor: '#c0c0c0', borderColor: '#6060ff', borderWidth: 2, borderRadius: 10, }} >
         <Text onPress={() => navigation.goBack()}>
@@ -97,7 +104,7 @@ export default function App() {
           options={{
             title: 'OL Forecast',
             headerStyle: {
-              backgroundColor: '#708090',
+              backgroundColor: '#1E90FF',
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
@@ -132,4 +139,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+  },
+
 });
