@@ -21,19 +21,25 @@ function HomeScreen({ navigation, route }) {
                    paddingBottom: 50
                  }}>
       <View style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#778899' }}>
-        <Image source={{uri: 'https://static01.nyt.com/images/2020/10/30/sports/30boxing01/merlin_166444809_30b6957a-ffec-4c5b-8b27-8659147ab2a7-superJumbo.jpg'}}
+        <Image source={{uri: 'https://scx2.b-cdn.net/gfx/news/hires/2019/weatherforec.jpg'}}
                style={{width: 400, height: 350}} />
-        <Text style={{ margin: 10 ,color:'#fff',padding: 5,backgroundColor: '#778899',borderColor: '#fff', borderWidth: 2, borderRadius: 10}}>Boxing Analyser to allow users to monitor punch outputs. I have designed this app due to my interest in
-        martial arts. I myself compete and find it very difficult to monitor output in sparring and bouts.</Text>
+        <Text style={{ margin: 10 ,color:'#fff',padding: 5,backgroundColor: '#778899',borderColor: '#fff', borderWidth: 2, borderRadius: 10}}>This App
+is designed to display weather for a current day or current week using Yahoo weather api.
+        </Text>
 
       </View>
       <View style={{flexDirection:'row'}}>
-
+      <View style={{ padding: 5, backgroundColor: '#FFFF33', marginBottom: 10, marginTop: 10, borderColor: '#fff', borderWidth: 2, borderRadius: 10, }} >
+      <Text style ={{fontSize:20}}onPress={() => navigation.navigate('ChartTheData')}>
+      Search Weather
+      </Text>
+      </View>
       <View style={{ padding: 5, backgroundColor: '#1E90FF', marginBottom: 10, marginTop: 10, borderColor: '#fff', borderWidth: 2, borderRadius: 10, }} >
-    <Text style ={{fontSize:15}}onPress={() => navigation.navigate('ChartTheData')}>
-      Start
+    <Text style ={{fontSize:20}}onPress={() => navigation.navigate('ChartTheData')}>
+      Search Forecast
     </Text>
     </View>
+
     </View>
     </View>
   );
@@ -89,7 +95,7 @@ export default function App() {
           name="Home"
           component={HomeScreen}
           options={{
-            title: 'HomeScreen',
+            title: 'OL Forecast',
             headerStyle: {
               backgroundColor: '#708090',
             },
