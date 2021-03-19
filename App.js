@@ -3,6 +3,7 @@ import { Text, TextInput, View, Button, Image, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MyChart } from './MyChart';
+import {weatherData} from './weatherData';
 import { YellowBox } from 'react-native';
 
 YellowBox.ignoreWarnings([ // https://reactnavigation.org/docs/troubleshooting/
@@ -10,7 +11,6 @@ YellowBox.ignoreWarnings([ // https://reactnavigation.org/docs/troubleshooting/
 ]);
 
 function HomeScreen({ navigation, route }) {
-
 
 
   return (
@@ -21,11 +21,13 @@ function HomeScreen({ navigation, route }) {
                    paddingBottom: 50
                  }}>
       <View style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#778899' }}>
+      <TextInput>
         <Image source={{uri: 'https://scx2.b-cdn.net/gfx/news/hires/2019/weatherforec.jpg'}}
                style={{width: 400, height: 350}} />
         <Text style={{ margin: 10 ,color:'#fff',padding: 5,backgroundColor: '#778899',borderColor: '#fff', borderWidth: 2, borderRadius: 10}}>This App
 is designed to display weather for a current day or current week using Yahoo weather api.
         </Text>
+        <weatherData></weatherData>
 
       </View>
       <View style={{flexDirection:'row'}}>
@@ -42,6 +44,7 @@ is designed to display weather for a current day or current week using Yahoo wea
 
     </View>
     </View>
+
   );
 }
 
