@@ -3,16 +3,42 @@ import { Text, TextInput, View, Button, Image, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MyChart } from './MyChart';
-import {weatherData} from './weatherData';
 import { YellowBox } from 'react-native';
 
 YellowBox.ignoreWarnings([ // https://reactnavigation.org/docs/troubleshooting/
   'Non-serializable values were found in the navigation state',
 ]);
 
-function HomeScreen({ navigation, route }) {
+function HomeScreen({ navigation, route })
+{
 
-const [text, onChangeText] = React.useState(null);
+  const [text, onChangeText] = React.useState(null);
+  const [DBData, setDBdata] = React.useState('');
+  const getWeatherDataFromApi = () =>
+  {
+    return fetch('https://api.openweathermap.org/data/2.5/weather?q=dublin&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146' , {
+      method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      })
+      .then((response) => response.json())
+      .then((json) => {
+        if(json){
+          console.log(json);
+          setDBdata(json);
+          console.log(DBData)
+        }
+        else(
+          console.log("error")
+        )
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    }
   return (
     <View style={{ flex: 1,
                    alignItems: 'center',
@@ -30,13 +56,11 @@ const [text, onChangeText] = React.useState(null);
               placeholder="Please Enter The Name Of The City"
       />
 
-      
+
       <Image source={{uri: 'https://scx2.b-cdn.net/gfx/news/hires/2019/weatherforec.jpg'}}
                style={{width: 400, height: 350}} />
-        <Text style={{ margin: 10 ,color:'#000',padding: 5,backgroundColor: '#fff',borderColor: '#000', borderWidth: 2, borderRadius: 10}}>This App
-is designed to display weather for a current day or current week using Yahoo weather api.
+        <Text style={{ margin: 10 ,color:'#000',padding: 5,backgroundColor: '#fff',borderColor: '#000', borderWidth: 2, borderRadius: 10}}>Weather Data: {DBData}
         </Text>
-        <weatherData></weatherData>
 
       </View>
       <View style={{flexDirection:'row'}}>
