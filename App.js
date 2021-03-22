@@ -1,18 +1,38 @@
 import React, { useState, useEffect } from "react";
-import { Text, TextInput, View, Button, Image, StyleSheet } from 'react-native';
+import { Text, TextInput, View, Button, Image, StyleSheet, TouchableHighlight } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MyChart } from './MyChart';
-import {weatherData} from './weatherData';
 import { YellowBox } from 'react-native';
 
 YellowBox.ignoreWarnings([ // https://reactnavigation.org/docs/troubleshooting/
   'Non-serializable values were found in the navigation state',
 ]);
+//const weatherData=[{''}];
+function HomeScreen({ navigation, route })
+{
 
-function HomeScreen({ navigation, route }) {
+  const [text, onChangeText] = React.useState(null);
+  const [weatherData, setWeatherData] = React.useState("hello");
+  const getWeatherDataFromApi = () =>
+  {
+     fetch('https://api.openweathermap.org/data/2.5/weather?q=dublin&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
+      .then((response) => response.json())
+      .then((json) => {
+        if(json){
+          setWeatherData(json.weather);
+          console.log(json.weather);
+          console.log(weatherData);
+        }
+        else(
+          console.log("error")
+        )
+      })
+      .catch((error) => {
+        console.error("error");
+      });
+    }
 
-const [text, onChangeText] = React.useState(null);
   return (
     <View style={{ flex: 1,
                    alignItems: 'center',
@@ -30,13 +50,11 @@ const [text, onChangeText] = React.useState(null);
               placeholder="Please Enter The Name Of The City"
       />
 
-      
+
       <Image source={{uri: 'https://scx2.b-cdn.net/gfx/news/hires/2019/weatherforec.jpg'}}
                style={{width: 400, height: 350}} />
-        <Text style={{ margin: 10 ,color:'#000',padding: 5,backgroundColor: '#fff',borderColor: '#000', borderWidth: 2, borderRadius: 10}}>This App
-is designed to display weather for a current day or current week using Yahoo weather api.
+        <Text style={{ margin: 10 ,color:'#000',padding: 5,backgroundColor: '#fff',borderColor: '#000', borderWidth: 2, borderRadius: 10}}>Weather Data:
         </Text>
-        <weatherData></weatherData>
 
       </View>
       <View style={{flexDirection:'row'}}>
@@ -49,8 +67,14 @@ is designed to display weather for a current day or current week using Yahoo wea
     <Text style ={{fontSize:20}}onPress={() => navigation.navigate('ChartTheData')}>
       Search Forecast
     </Text>
-    </View>
 
+    </View>
+    <View style={{ padding: 5, backgroundColor: '#0f0', marginBottom: 10, marginTop: 10, borderColor: '#fff', borderWidth: 2, borderRadius: 10, }} >
+    <Text style ={{fontSize:20}} onPress={getWeatherDataFromApi}>
+      Search
+    </Text>
+
+    </View>
     </View>
     </View>
 
