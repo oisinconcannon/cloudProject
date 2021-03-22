@@ -33,6 +33,7 @@ function HomeScreen({ navigation, route })
       });
     }
 
+
   return (
     <View style={{ flex: 1,
                    alignItems: 'center',
