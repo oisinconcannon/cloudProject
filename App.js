@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Text, TextInput, View, Button, Image, StyleSheet, TouchableHighlight } from 'react-native';
+import { Text, TextInput, View, Button, Image, StyleSheet, TouchableHighlight, Animated  } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MyChart } from './MyChart';
 import { YellowBox } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { weatherConditions } from './weatherConditions';
 
 YellowBox.ignoreWarnings(['Non-serializable values were found in the navigation state',]);
 
@@ -14,51 +15,116 @@ function HomeScreen({ navigation, route })
 {
   const [text, onChangeText] = React.useState(null);
   const [weatherData, setWeatherData] = React.useState("hello");
-  const getWeatherDataFromApi = () =>
-  {
-    fetch('https://api.openweathermap.org/data/2.5/weather?q=dublin&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
-    .then((response) => response.json())
-    .then((json) =>
-    {
-      if(json)
-      {
-        setWeatherData(json.weather);
-        console.log(json.weather);
-        console.log(weatherData);
-      }
-      else(console.log("error"))
-    })
-    .catch((error) =>
-    {
-      console.error("error");
-    });
-  }
-
 
   return(
-    <View style={{ flex: 1,alignItems: 'center',justifyContent: 'center',backgroundColor: '#fff',paddingBottom: 50}}>
+    <View style={styles.weatherContainer}>
+      <View style={styles.headerContainer}>
 
-      <View style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: '#778899' }}>
-        <TextInput style={styles.input} onChangeText={onChangeText} value={text} placeholder="Please Enter The Name Of The City"/>
-        <Image source={{uri: 'https://scx2.b-cdn.net/gfx/news/hires/2019/weatherforec.jpg'}} style={{width: 400, height: 350}} />
-        <Text style={{ margin: 10 ,color:'#000',padding: 5,backgroundColor: '#fff',borderColor: '#000', borderWidth: 2, borderRadius: 10}}>Weather Data:</Text>
+        <Text style={styles.tempText}>OL Weather App</Text>
+
       </View>
-
-      <View style={{flexDirection:'row'}}>
-        <View style={{ padding: 5, backgroundColor: '#FFFF33', marginBottom: 10, marginTop: 10, borderColor: '#fff', borderWidth: 2, borderRadius: 10, }} >
-          <Text style ={{fontSize:20}}onPress={() => navigation.navigate('ChartTheDataToday')}>Search Weather</Text>
-        </View>
-        <View style={{ padding: 5, backgroundColor: '#1E90FF', marginBottom: 10, marginTop: 10, borderColor: '#fff', borderWidth: 2, borderRadius: 10, }} >
-          <Text style ={{fontSize:20}}onPress={() => navigation.navigate('ChartTheData')}>Search Forecast</Text>
-        </View>
-        <View style={{ padding: 5, backgroundColor: '#0f0', marginBottom: 10, marginTop: 10, borderColor: '#fff', borderWidth: 2, borderRadius: 10, }} >
-          <Text style ={{fontSize:20}} onPress={getWeatherDataFromApi}>Search</Text>
-        </View>
+      <View style={styles.bodyContainer}>
+      <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
+      <MaterialCommunityIcons size={48} name="weather-sunny" color={'#fff'} />
+      <MaterialCommunityIcons size={48} name="weather-cloudy" color={'#fff'} />
+      <MaterialCommunityIcons size={48} name="weather-lightning" color={'#fff'} />
+      <MaterialCommunityIcons size={48} name="weather-snowy" color={'#fff'} />
+      <MaterialCommunityIcons size={48} name="weather-pouring" color={'#fff'} />
       </View>
+      <TextInput style={styles.input} onChangeText={onChangeText} value={text}/>
+        <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
+        <View style={{ padding: 10, backgroundColor: '#f7b733', marginBottom: 10, marginTop: 10, borderColor: '#f7b733', borderWidth: 3, borderRadius: 10}} >
+          <Text style ={{fontSize:20, color: '#fff'}} onPress={() => navigation.navigate('CurrentWeather')}>Search Weather</Text>
+        </View>
+        <View style={{ padding: 10, backgroundColor: '#f7b733', marginBottom: 10, marginTop: 10, borderColor: '#f7b733', borderWidth: 3, borderRadius: 10}} >
+          <Text style ={{fontSize:20, color: '#fff'}} onPress={() => navigation.navigate('CurrentWeather')}>Search Forecast</Text>
+        </View>
 
+
+
+    </View>
+      </View>
     </View>
   );
 }
+
+function CurrentWeather({ navigation, route })
+{
+  const [weather, setWeather] = React.useState('Clear');
+  const [temperature, setTemperature] = React.useState(null);
+  fetch('https://api.openweathermap.org/data/2.5/weather?q=ankara&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
+  .then((response) => response.json())
+  .then((json) =>
+  {
+    setTemperature(json.main.temp)
+    setWeather(json.weather[0].main)
+    /*this.setState({
+          temperature: json.main.temp,
+          weather: json.weather[0].main,
+    });*/
+
+  });
+
+  return(
+      <View style={[styles.weatherContainer,{ backgroundColor: weatherConditions[weather].color }]}>
+        <View style={styles.headerContainer}>
+          <MaterialCommunityIcons
+            size={72}
+            name={weatherConditions[weather].icon}
+            color={'#fff'}
+          />
+          <Text style={styles.tempText}>{temperature}˚</Text>
+        </View>
+        <View style={styles.bodyContainer}>
+          <Text style={styles.title}>{weatherConditions[weather].title}</Text>
+          <Text style={styles.subtitle}>
+            {weatherConditions[weather].subtitle}
+          </Text>
+        </View>
+      </View>
+    );
+};
+
+
+const styles = StyleSheet.create({
+  weatherContainer: {
+    flex: 1,
+    backgroundColor: '#f7b733'
+  },
+  headerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  tempText: {
+    fontSize: 48,
+    color: '#fff'
+  },
+  bodyContainer: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingLeft: 25,
+    marginBottom: 40
+  },
+  title: {
+    fontSize: 48,
+    color: '#fff'
+  },
+  subtitle: {
+    fontSize: 24,
+    color: '#fff'
+  },
+
+  input: {
+    backgroundColor: '#fff',
+    marginBottom: 10,
+    marginTop: 10,
+    borderWidth: 3,
+    borderRadius: 10
+  }
+});
+
 
 function ChartTheData({ navigation, route })
 {
@@ -102,6 +168,7 @@ function ChartTheData({ navigation, route })
   );
 }
 
+
 function ChartTheDataToday({ navigation, route })
 {
   const [text, onChangeText] = React.useState(null);
@@ -131,9 +198,9 @@ export default function App()
           name="Home"
           component={HomeScreen}
           options={{
-            title: 'OL Forecast',
+            title: '',
             headerStyle: {
-              backgroundColor: '#1E90FF',
+              backgroundColor: '#f7b733',
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
@@ -179,21 +246,25 @@ export default function App()
         />
 
 
+      <Stack.Screen
+        name="CurrentWeather"
+        component={CurrentWeather}
+        options={{
+          title: 'Current Weather',
+          backgroundColor: '#f7b733',
+          headerStyle: {
+            backgroundColor: weatherConditions['Clear'].color,
+            height: 50,
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          }
+        }}
+      />
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-  },
-
-});
