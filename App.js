@@ -52,11 +52,11 @@ function CurrentWeather({ navigation, route })
 {
   const [weather, setWeather] = React.useState('Clear');
   const [temperature, setTemperature] = React.useState(null);
-  fetch('https://api.openweathermap.org/data/2.5/weather?q=ankara&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
+  fetch('https://api.openweathermap.org/data/2.5/weather?q=galway&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
   .then((response) => response.json())
   .then((json) =>
   {
-    setTemperature(json.main.temp)
+    setTemperature(Math.round((json.main.temp) - 273.15))
     setWeather(json.weather[0].main)
     /*this.setState({
           temperature: json.main.temp,
