@@ -10,7 +10,7 @@ export const weatherConditions = {
     icon: 'weather-sunny'
   },
   Thunderstorm: {
-    color: '#616161',
+    color: '#a74fff',
     title: 'Thunderstorm',
     icon: 'weather-lightning'
   },

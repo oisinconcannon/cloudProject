@@ -27,12 +27,12 @@ function HomeScreen({ navigation, route })
         <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
           <MaterialCommunityIcons size={48} name="weather-sunny" color={'#f7b733'} />
           <MaterialCommunityIcons size={48} name="weather-cloudy" color={'#666666'} />
-          <MaterialCommunityIcons size={48} name="weather-lightning" color={'#616161'} />
+          <MaterialCommunityIcons size={48} name="weather-lightning" color={'#c44fff'} />
           <MaterialCommunityIcons size={48} name="weather-snowy" color={'#00d2ff'} />
           <MaterialCommunityIcons size={48} name="weather-rainy" color={'#005BEA'} />
         </View>
 
-        <TextInput style={styles.input} onChangeText={onChangeText} value={text}/>
+        <TextInput style={styles.input} placeholder="Enter City" onChangeText={onChangeText} value={text}/>
 
         <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
 
@@ -146,31 +146,23 @@ function ForecastWeather({ navigation, route })
     {
       if(json)
       {
-        console.log(json);
         setDay1(Math.round((json.daily[0].temp.day) - 273.15));
-        setDay2(Math.round((json.daily[1].temp.day) - 273.15));
-        setDay3(Math.round((json.daily[2].temp.day) - 273.15));
-        setDay4(Math.round((json.daily[3].temp.day) - 273.15));
-        setDay5(Math.round((json.daily[4].temp.day) - 273.15));
-        setDay6(Math.round((json.daily[5].temp.day) - 273.15));
-        setDay7(Math.round((json.daily[6].temp.day) - 273.15));
         setweatherDay1(json.daily[0].weather[0].description)
-        setweatherDay2(json.daily[1].weather[0].description)
-        setweatherDay3(json.daily[2].weather[0].description)
-        setweatherDay4(json.daily[3].weather[0].description)
-        setweatherDay5(json.daily[4].weather[0].description)
-        setweatherDay6(json.daily[5].weather[0].description)
-        setweatherDay7(json.daily[6].weather[0].description)
         setweatherConditionDay1(json.daily[0].weather[0].main)
+
+        setDay2(Math.round((json.daily[1].temp.day) - 273.15));
+        setweatherDay2(json.daily[1].weather[0].description)
         setweatherConditionDay2(json.daily[1].weather[0].main)
-        setweatherConditionDay3(json.daily[2].weather[0].main)
-        setweatherConditionDay4(json.daily[3].weather[0].main)
-        setweatherConditionDay5(json.daily[4].weather[0].main)
-        setweatherConditionDay6(json.daily[5].weather[0].main)
-        setweatherConditionDay7(json.daily[6].weather[0].main)
+
+        setDay3(Math.round((json.daily[2].temp.day) - 273.15));
+        setweatherDay3(json.daily[2].weather[0].description);
+        setweatherConditionDay3(json.daily[2].weather[0].main);
+
+        setDay4(Math.round((json.daily[3].temp.day) - 273.15));
+        setweatherDay4(json.daily[3].weather[0].description);
+        setweatherConditionDay4(json.daily[3].weather[0].main);
+
         console.log(weatherConditionDay1);
-
-
       }
       else(console.log("error"));
     })
