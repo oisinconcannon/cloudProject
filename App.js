@@ -17,32 +17,33 @@ function HomeScreen({ navigation, route })
   const [weatherData, setWeatherData] = React.useState("hello");
 
   return(
-    <View style={styles.weatherContainer}>
-      <View style={styles.headerContainer}>
+    <View style={[styles.weatherContainer ,{ backgroundColor: '#570091'}]}>
 
-        <Text style={styles.appHeading}>OL Weather App</Text>
+      <View style={[styles.headerContainer]}>
+        <Text style={[styles.appHeading]}>OL Weather App</Text>
+      </View>
 
-      </View>
-      <View style={styles.bodyContainer}>
-      <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
-      <MaterialCommunityIcons size={48} name="weather-sunny" color={'#fff'} />
-      <MaterialCommunityIcons size={48} name="weather-cloudy" color={'#fff'} />
-      <MaterialCommunityIcons size={48} name="weather-lightning" color={'#fff'} />
-      <MaterialCommunityIcons size={48} name="weather-snowy" color={'#fff'} />
-      <MaterialCommunityIcons size={48} id ='04d' name="04d" color={'#fff'} />
-      </View>
-      <TextInput style={styles.input} onChangeText={onChangeText} value={text}/>
+      <View style={[styles.bodyContainer]}>
         <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
-        <View style={{ padding: 10, backgroundColor: '#f7b733', marginBottom: 10, marginTop: 10, borderColor: '#f7b733', borderWidth: 3, borderRadius: 10}} >
-          <Text style ={{fontSize:20, color: '#fff'}} onPress={() => navigation.navigate('CurrentWeather',{ paramKey:text})}>Search Weather</Text>
+          <MaterialCommunityIcons size={48} name="weather-sunny" color={'#f7b733'} />
+          <MaterialCommunityIcons size={48} name="weather-cloudy" color={'#666666'} />
+          <MaterialCommunityIcons size={48} name="weather-lightning" color={'#616161'} />
+          <MaterialCommunityIcons size={48} name="weather-snowy" color={'#00d2ff'} />
+          <MaterialCommunityIcons size={48} name="weather-rainy" color={'#005BEA'} />
         </View>
-        <View style={{ padding: 10, backgroundColor: '#f7b733', marginBottom: 10, marginTop: 10, borderColor: '#f7b733', borderWidth: 3, borderRadius: 10}} >
-          <Text style ={{fontSize:20, color: '#fff'}} onPress={() => navigation.navigate('ForecastWeather',{ paramKey:text})}>Search Forecast</Text>
+
+        <TextInput style={styles.input} onChangeText={onChangeText} value={text}/>
+
+        <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
+
+          <View style={{ padding: 10, backgroundColor: '#570091', marginBottom: 10, marginTop: 10, borderColor: '#570091', borderWidth: 3, borderRadius: 10}} >
+            <Text style ={{fontSize:20, color: '#fff'}} onPress={() => navigation.navigate('CurrentWeather',{ paramKey:text})}>Search Weather</Text>
+          </View>
+
+          <View style={{ padding: 10, backgroundColor: '#570091', marginBottom: 10, marginTop: 10, borderColor: '#570091', borderWidth: 3, borderRadius: 10}} >
+            <Text style ={{fontSize:20, color: '#fff'}} onPress={() => navigation.navigate('ForecastWeather',{ paramKey:text})}>Search Forecast</Text>
+          </View>
         </View>
-
-
-
-    </View>
       </View>
     </View>
   );
@@ -81,25 +82,25 @@ function CurrentWeather({ navigation, route })
 
   return(
       <View style={[styles.weatherContainer,{ backgroundColor: weatherConditions[weather].color }]}>
-        <View style={styles.headerContainer}>
+        <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
         <Text style={styles.tempText}>{city}</Text>
           <MaterialCommunityIcons size={80} name={weatherConditions[weather].icon} color={'#fff'}/>
           <Text style={styles.tempText}>{temperature}˚C</Text>
-        </View>
-        <View style={styles.bodyContainer}>
-          <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
-            <Text style={styles.infoHeadingText}>Feels Like</Text>
-            <Text style={styles.infosubtitleText}>{feelsliketemperature}˚C</Text>
-            <Text style={styles.infoHeadingText}>Wind</Text>
-            <Text style={styles.infosubtitleText}>{windSpeed} km/p</Text>
-            <MaterialCommunityIcons size={50} name='rewind-outline'   style={{transform: [{ rotate: windDirection }]}} color={'#fff'}/>
-            <Text style={styles.infoHeadingText}>Humidity</Text>
-            <Text style={styles.infosubtitleText}> {humidity}%</Text>
-            <Text style={styles.infoHeadingText}>Pressure</Text>
-            <Text style={styles.infosubtitleText}>{pressure} hPa</Text>
+          <View style={styles.bodyContainer}>
+            <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
+              <Text style={styles.infoHeadingText}>Feels Like</Text>
+              <Text style={styles.infosubtitleText}>{feelsliketemperature}˚C</Text>
+              <Text style={styles.infoHeadingText}>Wind</Text>
+              <Text style={styles.infosubtitleText}>{windSpeed} km/p</Text>
+              <MaterialCommunityIcons size={50} name='rewind-outline'   style={{transform: [{ rotate: windDirection }]}} color={'#fff'}/>
+              <Text style={styles.infoHeadingText}>Humidity</Text>
+              <Text style={styles.infosubtitleText}> {humidity}%</Text>
+              <Text style={styles.infoHeadingText}>Pressure</Text>
+              <Text style={styles.infosubtitleText}>{pressure} hPa</Text>
+            </View>
+            <Text style={styles.title}>{weatherConditions[weather].title}</Text>
+            <Text style={styles.subtitle}>{weatherDescription}</Text>
           </View>
-          <Text style={styles.title}>{weatherConditions[weather].title}</Text>
-          <Text style={styles.subtitle}>{weatherDescription}</Text>
         </View>
       </View>
     );
@@ -180,10 +181,10 @@ function ForecastWeather({ navigation, route })
 
   return(
     <View style={[styles.weatherContainer ,{ backgroundColor: '#570091'}]}>
-      <View style={{justifyContent: 'center'}, {alignItems: 'center'}}>
+      <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
         <Text style={styles.appHeading}>{city}</Text>
         <Text style={styles.appHeading}>4 Day Forecast</Text>
-      </View>
+
       <View style={styles.bodyContainer}>
 
 
@@ -219,6 +220,7 @@ function ForecastWeather({ navigation, route })
         <Text style={styles.subtitleForecast}>{weatherday4}</Text>
 
 
+      </View>
       </View>
     </View>
   );
@@ -355,7 +357,7 @@ export default function App()
           options={{
             title: '',
             headerStyle: {
-              backgroundColor: '#f7b733',
+              backgroundColor: '#570091',
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
@@ -390,7 +392,7 @@ export default function App()
             title: 'Forecast',
             backgroundColor: '#1e90ff',
             headerStyle: {
-              backgroundColor: '#000080',
+              backgroundColor: '#570091',
               height: 50,
             },
             headerTintColor: '#fff',
@@ -408,7 +410,7 @@ export default function App()
           title: 'Current Weather',
           backgroundColor: '#f7b733',
           headerStyle: {
-            backgroundColor: weatherConditions['Clear'].color,
+            backgroundColor: '#570091',
             height: 50,
           },
           headerTintColor: '#fff',

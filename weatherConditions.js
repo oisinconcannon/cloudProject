@@ -6,12 +6,12 @@ export const weatherConditions = {
   },
   Clear: {
     color: '#f7b733',
-    title: 'So Sunny',
+    title: 'Clear',
     icon: 'weather-sunny'
   },
   Thunderstorm: {
     color: '#616161',
-    title: 'A Storm is coming',
+    title: 'Thunderstorm',
     icon: 'weather-lightning'
   },
   Clouds: {
