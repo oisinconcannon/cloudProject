@@ -9,13 +9,14 @@ import { weatherConditions } from './weatherConditions';
 
 YellowBox.ignoreWarnings(['Non-serializable values were found in the navigation state',]);
 
-
+var x =0;
 //const weatherData=[{''}];
 function HomeScreen({ navigation, route })
 {
   const [text, onChangeText] = React.useState(null);
   const [weatherData, setWeatherData] = React.useState("hello");
-
+  x=0;
+  console.log("HomeScreen:"+x);
   return(
     <View style={[styles.weatherContainer ,{ backgroundColor: '#570091'}]}>
 
@@ -41,7 +42,12 @@ function HomeScreen({ navigation, route })
           </View>
 
           <View style={{ padding: 10, backgroundColor: '#570091', marginBottom: 10, marginTop: 10, borderColor: '#570091', borderWidth: 3, borderRadius: 10}} >
-            <Text style ={{fontSize:20, color: '#fff'}} onPress={() => navigation.navigate('ForecastWeather',{ paramKey:text})}>Search Forecast</Text>
+            <Text style ={{fontSize:20, color: '#fff'}} onPress={() => navigation.navigate('ForecastWeather',{ paramKey:text})}
+            >Search Forecast</Text>
+          </View>
+          <View style={{ padding: 10, backgroundColor: '#570091', marginBottom: 10, marginTop: 10, borderColor: '#570091', borderWidth: 3, borderRadius: 10}} >
+            <Text style ={{fontSize:20, color: '#fff'}} onPress={() =>navigation.navigate('SearchHistory')}
+            >Search History</Text>
           </View>
         </View>
       </View>
@@ -57,9 +63,23 @@ function CurrentWeather({ navigation, route })
   const [pressure, setPressure] = React.useState(null);
   const [humidity, setHumidity] = React.useState(null);
   const [windDirection, setWindDirection] = React.useState('');
+  const [windDirectionStr, setWindDirectionStr] = React.useState('');
   const [windSpeed, setWindSpeed] = React.useState(null);
   const [weatherDescription, setweatherDescription] = React.useState(null);
   const [city, setCity] = React.useState(route.params.paramKey);
+  x++;
+  console.log("Current:"+x)
+  if(x==1){
+    fetch('http://192.168.1.53:8000/saveWeather/', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({city})
+      });
+}
+
   fetch('https://api.openweathermap.org/data/2.5/weather?q='+city+'&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
   .then((response) => response.json())
   .then((json) =>
@@ -73,12 +93,15 @@ function CurrentWeather({ navigation, route })
     setweatherDescription(json.weather[0].description)
     setWeather(json.weather[0].main)
     console.log(windDirection);
+    setWindDirectionStr('"'+windDirection+'"');
+
     /*this.setState({
           temperature: json.main.temp,
           weather: json.weather[0].main,
     });*/
 
   });
+
 
   return(
       <View style={[styles.weatherContainer,{ backgroundColor: weatherConditions[weather].color }]}>
@@ -103,6 +126,7 @@ function CurrentWeather({ navigation, route })
           </View>
         </View>
       </View>
+
     );
 };
 
@@ -132,6 +156,18 @@ function ForecastWeather({ navigation, route })
   const [weatherConditionDay6, setweatherConditionDay6] = React.useState('Clear');
   const [weatherConditionDay7, setweatherConditionDay7] = React.useState('Clear');
   const [lat, setLat] = React.useState('');
+  x++;
+  console.log("Current:"+x)
+  if(x==1){
+    fetch('http://192.168.1.53:8000/saveWeather/', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({city})
+      });
+}
   fetch('https://api.openweathermap.org/data/2.5/weather?q='+city+'&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
   .then((response) => response.json())
   .then((json) =>
@@ -171,6 +207,8 @@ function ForecastWeather({ navigation, route })
       console.error("error");
     });
 
+
+
   return(
     <View style={[styles.weatherContainer ,{ backgroundColor: '#570091'}]}>
       <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
@@ -206,7 +244,7 @@ function ForecastWeather({ navigation, route })
 
         <Text style={styles.titleForcast}>4 Days Time</Text>
         <View style={{flexDirection: 'row'}}>
-          <MaterialCommunityIcons size={60} name={weatherConditions[weatherConditionDay3].icon} color={weatherConditions[weatherConditionDay4].color}/>
+          <MaterialCommunityIcons size={60} name={weatherConditions[weatherConditionDay4].icon} color={weatherConditions[weatherConditionDay4].color}/>
           <Text style={styles.subtitle}>{day4}˚C</Text>
         </View>
         <Text style={styles.subtitleForecast}>{weatherday4}</Text>
@@ -217,7 +255,38 @@ function ForecastWeather({ navigation, route })
     </View>
   );
 };
+function SearchHistory({ navigation, route })
+{
 
+
+    fetch('http://192.168.1.53:8000/getHistory/', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify()
+      })
+      .then((response) => response.json())
+                 .then((json) => {
+
+                   console.log(json.city[0]);
+                 })
+                 .catch((error) => {
+                   console.error(error);
+                 });
+
+
+
+
+
+  return(
+      <Text> Hello </Text>
+
+
+
+  );
+};
 const styles = StyleSheet.create({
   weatherContainer: {
     flex: 1,
@@ -375,7 +444,20 @@ export default function App()
             }
           }}
         />
-
+        <Stack.Screen
+          name="SearchHistory"
+          component={SearchHistory}
+          options={{
+            title: '',
+            headerStyle: {
+              backgroundColor: '#570091',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            }
+          }}
+        />
 
         <Stack.Screen
           name="ForecastWeather"
