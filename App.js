@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, TextInput, View, Button, Image, StyleSheet, TouchableHighlight, Animated  } from 'react-native';
+import { Text, TextInput, View, Button, Image, StyleSheet, TouchableHighlight, Animated, ScrollView  } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { MyChart } from './MyChart';
@@ -8,18 +8,16 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { weatherConditions } from './weatherConditions';
 
 YellowBox.ignoreWarnings(['Non-serializable values were found in the navigation state',]);
-
 var x =0;
 //const weatherData=[{''}];
 function HomeScreen({ navigation, route })
 {
-  const [text, onChangeText] = React.useState(null);
-  const [weatherData, setWeatherData] = React.useState("hello");
+  const [text, onChangeText] = React.useState('');
+  const [weatherData, setWeatherData] = React.useState("");
   x=0;
   console.log("HomeScreen:"+x);
   return(
     <View style={[styles.weatherContainer ,{ backgroundColor: '#570091'}]}>
-
       <View style={[styles.headerContainer]}>
         <Text style={[styles.appHeading]}>OL Weather App</Text>
       </View>
@@ -57,75 +55,74 @@ function HomeScreen({ navigation, route })
 
 function CurrentWeather({ navigation, route })
 {
-  const [weather, setWeather] = React.useState('Clear');
-  const [temperature, setTemperature] = React.useState(null);
-  const [feelsliketemperature, setFeelsLikeTemperature] = React.useState(null);
-  const [pressure, setPressure] = React.useState(null);
-  const [humidity, setHumidity] = React.useState(null);
-  const [windDirection, setWindDirection] = React.useState('');
-  const [windDirectionStr, setWindDirectionStr] = React.useState('');
-  const [windSpeed, setWindSpeed] = React.useState(null);
-  const [weatherDescription, setweatherDescription] = React.useState(null);
-  const [city, setCity] = React.useState(route.params.paramKey);
   x++;
-  console.log("Current:"+x)
+  const [weather, setWeather] = React.useState({ weatherCondition: "Clear", temperature: "", feelsliketemperature: "", pressure: "",
+        humidity: "", windDirection: "", windSpeed: "", weatherDescription: ""});
+  const [city, setCity] = React.useState(route.params.paramKey);
+
   if(x==1){
-    fetch('http://192.168.1.53:8000/saveWeather/', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({city})
-      });
+    fetch('https://api.openweathermap.org/data/2.5/weather?q='+city+'&appid=13776b8ebe5a6b4382130fef9aa0ad33')
+    .then((response) => response.json())
+    .then((json) =>
+    {
+      setWeather({weatherCondition: json.weather[0].main, temperature: Math.round((json.main.temp) - 273.15), feelsliketemperature: Math.round((json.main.feels_like) - 273.15),
+                  feelsliketemperature: '', pressure: json.main.pressure,humidity: json.main.humidity,
+                  windDirection: json.wind.deg + 90 + 'deg', windSpeed: Math.round(json.wind.speed),
+                  weatherDescription: json.weather[0].description})
+
+      let weatherData =
+      {
+        city:city,
+        temp: Math.round((json.main.feels_like) - 273.15),
+        windspeed: Math.round(json.wind.speed),
+        weatherdescription: json.weather[0].description,
+        weatherCondition: json.weather[0].main
+      }
+
+      fetch('http://192.168.1.17:8000/saveWeather/',
+      {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({weatherData})
+        });
+      console.log(weather);
+      console.log(weatherData);
+    });
 }
 
-  fetch('https://api.openweathermap.org/data/2.5/weather?q='+city+'&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
-  .then((response) => response.json())
-  .then((json) =>
-  {
-    setTemperature(Math.round((json.main.temp) - 273.15))
-    setFeelsLikeTemperature(Math.round((json.main.feels_like) - 273.15))
-    setPressure(json.main.pressure)
-    setHumidity(json.main.humidity)
-    setWindSpeed(Math.round(json.wind.speed))
-    setWindDirection(json.wind.deg + 90 + 'deg')
-    setweatherDescription(json.weather[0].description)
-    setWeather(json.weather[0].main)
-    console.log(windDirection);
-    setWindDirectionStr('"'+windDirection+'"');
 
-    /*this.setState({
-          temperature: json.main.temp,
-          weather: json.weather[0].main,
-    });*/
-
-  });
 
 
   return(
-      <View style={[styles.weatherContainer,{ backgroundColor: weatherConditions[weather].color }]}>
+      <View style={[styles.weatherContainer,{ backgroundColor: weatherConditions[weather.weatherCondition].color }]}>
         <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
         <Text style={styles.tempText}>{city}</Text>
-          <MaterialCommunityIcons size={80} name={weatherConditions[weather].icon} color={'#fff'}/>
-          <Text style={styles.tempText}>{temperature}˚C</Text>
-          <View style={styles.bodyContainer}>
+          <MaterialCommunityIcons size={80} name={weatherConditions[weather.weatherCondition].icon} color={'#fff'}/>
+          <Text style={styles.tempText}>{weather.temperature}˚C</Text>
+        </View>
+        <ScrollView>
+        <View style={styles.bodyContainer}>
             <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
               <Text style={styles.infoHeadingText}>Feels Like</Text>
-              <Text style={styles.infosubtitleText}>{feelsliketemperature}˚C</Text>
+              <Text style={styles.infosubtitleText}>{weather.feelsliketemperature}˚C</Text>
               <Text style={styles.infoHeadingText}>Wind</Text>
-              <Text style={styles.infosubtitleText}>{windSpeed} km/p</Text>
-              <MaterialCommunityIcons size={50} name='rewind-outline'   style={{transform: [{ rotate: windDirection }]}} color={'#fff'}/>
+              <Text style={styles.infosubtitleText}>{weather.windSpeed} km/p</Text>
+              <MaterialCommunityIcons size={50} name='rewind-outline'   style={{transform: [{ rotate: weather.windDirection }]}} color={'#fff'}/>
               <Text style={styles.infoHeadingText}>Humidity</Text>
-              <Text style={styles.infosubtitleText}> {humidity}%</Text>
+              <Text style={styles.infosubtitleText}> {weather.humidity}%</Text>
               <Text style={styles.infoHeadingText}>Pressure</Text>
-              <Text style={styles.infosubtitleText}>{pressure} hPa</Text>
+              <Text style={styles.infosubtitleText}>{weather.pressure} hPa</Text>
             </View>
-            <Text style={styles.title}>{weatherConditions[weather].title}</Text>
-            <Text style={styles.subtitle}>{weatherDescription}</Text>
-          </View>
         </View>
-      </View>
+        </ScrollView>
+        <View style = {{justifyContent: 'flex-end'}, {alignItems: 'center'}}>
+          <Text style={styles.title}>{weatherConditions[weather.weatherCondition].title}</Text>
+          <Text style={styles.subtitle}>{weather.weatherDescription}</Text>
+        </View>
+        </View>
 
     );
 };
@@ -133,133 +130,184 @@ function CurrentWeather({ navigation, route })
 function ForecastWeather({ navigation, route })
 {
   const [city, setCity] = React.useState(route.params.paramKey);
-  const [lon, setLon] = React.useState('');
-  const [day1, setDay1] = React.useState(null);
-  const [day2, setDay2] = React.useState(null);
-  const [day3, setDay3] = React.useState(null);
-  const [day4, setDay4] = React.useState(null);
-  const [day5, setDay5] = React.useState(null);
-  const [day6, setDay6] = React.useState(null);
-  const [day7, setDay7] = React.useState(null);
-  const [weatherday1, setweatherDay1] = React.useState(null);
-  const [weatherday2, setweatherDay2] = React.useState(null);
-  const [weatherday3, setweatherDay3] = React.useState(null);
-  const [weatherday4, setweatherDay4] = React.useState(null);
-  const [weatherday5, setweatherDay5] = React.useState(null);
-  const [weatherday6, setweatherDay6] = React.useState(null);
-  const [weatherday7, setweatherDay7] = React.useState(null);
-  const [weatherConditionDay1, setweatherConditionDay1] = React.useState('Clear');
-  const [weatherConditionDay2, setweatherConditionDay2] = React.useState('Clear');
-  const [weatherConditionDay3, setweatherConditionDay3] = React.useState('Clear');
-  const [weatherConditionDay4, setweatherConditionDay4] = React.useState('Clear');
-  const [weatherConditionDay5, setweatherConditionDay5] = React.useState('Clear');
-  const [weatherConditionDay6, setweatherConditionDay6] = React.useState('Clear');
-  const [weatherConditionDay7, setweatherConditionDay7] = React.useState('Clear');
-  const [lat, setLat] = React.useState('');
+  //const [latlon, setLatLon] = React.useState({lon: null, lat: null});
+  const [forecast, setForecast] = React.useState({
+                                        day1: {weatherCondition: "Clear", temperature: "", weatherDescription: ""},
+                                        day2: {weatherCondition: "Clear", temperature: "", weatherDescription: "" },
+                                        day3: {weatherCondition: "Clear", temperature: "", weatherDescription: "" },
+                                        day4: {weatherCondition: "Clear", temperature: "", weatherDescription: "" },
+                                        day5: {weatherCondition: "Clear", temperature: "", weatherDescription: "" },
+                                        day6: {weatherCondition: "Clear", temperature: "", weatherDescription: "" },
+                                        day7: {weatherCondition: "Clear", temperature: "", weatherDescription: "" }
+                                      });
+
+
   x++;
   console.log("Current:"+x)
-  if(x==1){
-    fetch('http://192.168.1.53:8000/saveWeather/', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({city})
-      });
-}
-  fetch('https://api.openweathermap.org/data/2.5/weather?q='+city+'&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
+
+if(x==1){
+  fetch('https://api.openweathermap.org/data/2.5/weather?q='+city+'&appid=13776b8ebe5a6b4382130fef9aa0ad33')
   .then((response) => response.json())
   .then((json) =>
   {
-  setLon(json.coord.lon);
-  setLat(json.coord.lat);
-
-  });
-    fetch('https://api.openweathermap.org/data/2.5/onecall?lat='+lat+'&lon='+lon+'&exclude=&appid=1f3b675bf27e4e2e0ec49c0f6a5bc146')
+    let latlon =
+    {
+      lat:json.coord.lat,
+      lon: json.coord.lon
+    }
+    let weatherData =
+    {
+      city:city,
+      temp: Math.round((json.main.feels_like) - 273.15),
+      windspeed: Math.round(json.wind.speed),
+      weatherdescription: json.weather[0].description,
+      weatherCondition: json.weather[0].main
+    }
+    fetch('https://api.openweathermap.org/data/2.5/onecall?lat='+latlon.lat+'&lon='+latlon.lon+'&exclude=&appid=13776b8ebe5a6b4382130fef9aa0ad33')
     .then((response) => response.json())
     .then((json) =>
     {
       if(json)
       {
-        setDay1(Math.round((json.daily[0].temp.day) - 273.15));
-        setweatherDay1(json.daily[0].weather[0].description)
-        setweatherConditionDay1(json.daily[0].weather[0].main)
-
-        setDay2(Math.round((json.daily[1].temp.day) - 273.15));
-        setweatherDay2(json.daily[1].weather[0].description)
-        setweatherConditionDay2(json.daily[1].weather[0].main)
-
-        setDay3(Math.round((json.daily[2].temp.day) - 273.15));
-        setweatherDay3(json.daily[2].weather[0].description);
-        setweatherConditionDay3(json.daily[2].weather[0].main);
-
-        setDay4(Math.round((json.daily[3].temp.day) - 273.15));
-        setweatherDay4(json.daily[3].weather[0].description);
-        setweatherConditionDay4(json.daily[3].weather[0].main);
-
-        console.log(weatherConditionDay1);
+        setForecast({
+                    day1:
+                    {
+                      weatherCondition: json.daily[0].weather[0].main ,
+                      temperature: Math.round((json.daily[0].temp.day) - 273.15),
+                      weatherDescription: json.daily[0].weather[0].description
+                    },
+                    day2:
+                    {
+                      weatherCondition: json.daily[1].weather[0].main ,
+                      temperature: Math.round((json.daily[1].temp.day) - 273.15),
+                      weatherDescription: json.daily[1].weather[0].description
+                    },
+                    day3:
+                    {
+                      weatherCondition: json.daily[2].weather[0].main ,
+                      temperature: Math.round((json.daily[2].temp.day) - 273.15),
+                      weatherDescription: json.daily[2].weather[0].description
+                    },
+                    day4:
+                    {
+                      weatherCondition: json.daily[3].weather[0].main ,
+                      temperature: Math.round((json.daily[3].temp.day) - 273.15),
+                      weatherDescription: json.daily[3].weather[0].description
+                    },
+                    day5:
+                    {
+                      weatherCondition: json.daily[4].weather[0].main ,
+                      temperature: Math.round((json.daily[4].temp.day) - 273.15),
+                      weatherDescription: json.daily[4].weather[0].description
+                    },
+                    day6:
+                    {
+                      weatherCondition: json.daily[5].weather[0].main ,
+                      temperature: Math.round((json.daily[5].temp.day) - 273.15),
+                      weatherDescription: json.daily[5].weather[0].description
+                    },
+                    day7:
+                    {
+                      weatherCondition: json.daily[6].weather[0].main ,
+                      temperature: Math.round((json.daily[6].temp.day) - 273.15),
+                      weatherDescription: json.daily[6].weather[0].description
+                    },
+              })
       }
       else(console.log("error"));
-    })
-    .catch((error) =>
-    {
-      console.error("error");
     });
-
+    console.log(weatherData);
+    console.log(latlon.lat);
+    console.log(latlon.lon);
+  })
+}
+console.log(forecast);
 
 
   return(
     <View style={[styles.weatherContainer ,{ backgroundColor: '#570091'}]}>
-      <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
-        <Text style={styles.appHeading}>{city}</Text>
-        <Text style={styles.appHeading}>4 Day Forecast</Text>
 
-      <View style={styles.bodyContainer}>
-
-
-        <Text style={styles.titleForcast} >1 Days Time</Text>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialCommunityIcons size={60} name={weatherConditions[weatherConditionDay1].icon} color={weatherConditions[weatherConditionDay1].color}/>
-          <Text style={styles.subtitle}>{day1}˚C</Text>
-        </View>
-        <Text style={styles.subtitleForecast}>{weatherday1}</Text>
-
-
-        <Text style={styles.titleForcast}>2 Days Time</Text>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialCommunityIcons size={60} name={weatherConditions[weatherConditionDay2].icon} color={weatherConditions[weatherConditionDay2].color}/>
-          <Text style={styles.subtitle}>{day2}˚C</Text>
-        </View>
-        <Text style={styles.subtitleForecast}>{weatherday2}</Text>
-
-
-        <Text style={styles.titleForcast}>3 Days Time</Text>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialCommunityIcons size={60} name={weatherConditions[weatherConditionDay3].icon} color={weatherConditions[weatherConditionDay3].color}/>
-          <Text style={styles.subtitle}>{day3}˚C</Text>
-        </View>
-        <Text style={styles.subtitleForecast}>{weatherday3}</Text>
-
-
-        <Text style={styles.titleForcast}>4 Days Time</Text>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialCommunityIcons size={60} name={weatherConditions[weatherConditionDay4].icon} color={weatherConditions[weatherConditionDay4].color}/>
-          <Text style={styles.subtitle}>{day4}˚C</Text>
-        </View>
-        <Text style={styles.subtitleForecast}>{weatherday4}</Text>
-
-
-      </View>
-      </View>
+        <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
+          <Text style={styles.appHeading}>{city}</Text>
     </View>
+        <ScrollView>
+        <View style={styles.bodyContainer}>
+
+
+          <Text style={styles.titleForcast} >1 Days Time</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[forecast.day1.weatherCondition].icon} color={weatherConditions[forecast.day1.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{forecast.day1.temperature}˚C</Text>
+          </View>
+          <Text style={styles.subtitleForecast}>{forecast.day1.weatherDescription}</Text>
+
+
+          <Text style={styles.titleForcast}>2 Days Time</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[forecast.day2.weatherCondition].icon} color={weatherConditions[forecast.day2.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{forecast.day2.temperature}˚C</Text>
+          </View>
+          <Text style={styles.subtitleForecast}>{forecast.day2.weatherDescription}</Text>
+
+
+          <Text style={styles.titleForcast}>3 Days Time</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[forecast.day3.weatherCondition].icon} color={weatherConditions[forecast.day3.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{forecast.day3.temperature}˚C</Text>
+          </View>
+          <Text style={styles.subtitleForecast}>{forecast.day3.weatherDescription}</Text>
+
+
+          <Text style={styles.titleForcast}>4 Days Time</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[forecast.day4.weatherCondition].icon} color={weatherConditions[forecast.day4.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{forecast.day4.temperature}˚C</Text>
+          </View>
+          <Text style={styles.subtitleForecast}>{forecast.day4.weatherDescription}</Text>
+
+          <Text style={styles.titleForcast}>5 Days Time</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[forecast.day5.weatherCondition].icon} color={weatherConditions[forecast.day5.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{forecast.day5.temperature}˚C</Text>
+          </View>
+          <Text style={styles.subtitleForecast}>{forecast.day5.weatherDescription}</Text>
+
+          <Text style={styles.titleForcast}>6 Days Time</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[forecast.day6.weatherCondition].icon} color={weatherConditions[forecast.day6.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{forecast.day6.temperature}˚C</Text>
+          </View>
+          <Text style={styles.subtitleForecast}>{forecast.day6.weatherDescription}</Text>
+
+          <Text style={styles.titleForcast}>7 Days Time</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[forecast.day7.weatherCondition].icon} color={weatherConditions[forecast.day7.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{forecast.day7.temperature}˚C</Text>
+          </View>
+          <Text style={styles.subtitleForecast}>{forecast.day7.weatherDescription}</Text>
+        </View>
+
+      </ScrollView>
+      <View style = {{justifyContent: 'flex-end'}, {alignItems: 'center'}}>
+      <Text style={styles.appHeading}>7 Day Forecast</Text>
+      </View>
+      </View>
+
   );
 };
 function SearchHistory({ navigation, route })
 {
+   const [cityHistory, setCityHistory] = React.useState({
+                                        city1: {city: "", weatherCondition: "Clear", temperature: "", weatherDescription: "" , windSpeed: ""},
+                                        city2: {city: "", weatherCondition: "Clear", temperature: "", weatherDescription: "" , windSpeed: ""},
+                                        city3: {city: "", weatherCondition: "Clear", temperature: "", weatherDescription: "" , windSpeed: ""},
+                                        city4: {city: "", weatherCondition: "Clear", temperature: "", weatherDescription: "" , windSpeed: ""},
+                                        city5: {city: "", weatherCondition: "Clear", temperature: "", weatherDescription: "" , windSpeed: ""},
+                                        city6: {city: "", weatherCondition: "Clear", temperature: "", weatherDescription: "" , windSpeed: ""},
+                                        city7: {city: "", weatherCondition: "Clear", temperature: "", weatherDescription: "" , windSpeed: ""}
+                                      });
 
-
-    fetch('http://192.168.1.53:8000/getHistory/', {
+    fetch('http://192.168.1.17:8000/getHistory/', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -268,22 +316,138 @@ function SearchHistory({ navigation, route })
         body: JSON.stringify()
       })
       .then((response) => response.json())
-                 .then((json) => {
-
-                   console.log(json.city[0]);
-                 })
-                 .catch((error) => {
-                   console.error(error);
-                 });
-
-
-
+      .then((json) => {
+       setCityHistory({
+                   city1:
+                   {
+                     city: json.city.[json.city.length - 1].city,
+                     weatherCondition: json.city.[json.city.length - 1].weatherCondition ,
+                     temperature: json.city.[json.city.length - 1].temp,
+                     weatherDescription: json.city.[json.city.length - 1].weatherdescription,
+                     windSpeed: json.city.[json.city.length - 1].windspeed
+                   },
+                   city2:
+                   {
+                     city: json.city.[json.city.length - 2].city,
+                     weatherCondition: json.city.[json.city.length - 2].weatherCondition ,
+                     temperature: json.city.[json.city.length - 2].temp,
+                     weatherDescription: json.city.[json.city.length - 2].weatherdescription,
+                     windSpeed: json.city.[json.city.length - 2].windspeed
+                   },
+                   city3:
+                   {
+                     city: json.city.[json.city.length - 3].city,
+                     weatherCondition: json.city.[json.city.length - 3].weatherCondition ,
+                     temperature: json.city.[json.city.length - 1].temp,
+                     weatherDescription: json.city.[json.city.length - 3].weatherdescription,
+                     windSpeed: json.city.[json.city.length - 3].windspeed
+                   },
+                   city4:
+                   {
+                     city: json.city.[json.city.length - 4].city,
+                     weatherCondition: json.city.[json.city.length - 4].weatherCondition ,
+                     temperature: json.city.[json.city.length - 4].temp,
+                     weatherDescription: json.city.[json.city.length - 4].weatherdescription,
+                     windSpeed: json.city.[json.city.length - 4].windspeed
+                   },
+                   city5:
+                   {
+                     city: json.city.[json.city.length - 5].city,
+                     weatherCondition: json.city.[json.city.length - 5].weatherCondition ,
+                     temperature: json.city.[json.city.length - 5].temp,
+                     weatherDescription: json.city.[json.city.length - 5].weatherdescription,
+                     windSpeed: json.city.[json.city.length - 5].windspeed
+                   },
+                   city6:
+                   {
+                     city: json.city.[json.city.length - 6].city,
+                     weatherCondition: json.city.[json.city.length - 6].weatherCondition ,
+                     temperature: json.city.[json.city.length - 6].temp,
+                     weatherDescription: json.city.[json.city.length - 6].weatherdescription,
+                     windSpeed: json.city.[json.city.length - 6].windspeed
+                   },
+                   city7:
+                   {
+                     city: json.city.[json.city.length - 7].city,
+                     weatherCondition: json.city.[json.city.length - 7].weatherCondition ,
+                     temperature: json.city.[json.city.length - 7].temp,
+                     weatherDescription: json.city.[json.city.length - 7].weatherdescription,
+                     windSpeed: json.city.[json.city.length - 7].windspeed
+                   },
+             })
+     })
+     .catch((error) =>
+     {
+       console.error(error);
+     });
 
 
   return(
-      <Text> Hello </Text>
+    <View style={[styles.weatherContainer ,{ backgroundColor: '#570091'}]}>
+      <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
+        <Text style={styles.appHeading}>History</Text>
+        <View style={styles.bodyContainer}>
+
+          <Text style={styles.titleForcast} >{cityHistory.city1.city}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[cityHistory.city1.weatherCondition].icon} color={weatherConditions[cityHistory.city1.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{cityHistory.city1.temperature}˚C</Text>
+          </View>
+          <Text style={styles.infosubtitleText}>{cityHistory.city1.windSpeed} km/p</Text>
+          <Text style={styles.subtitleForecast}>{cityHistory.city1.weatherDescription}</Text>
+
+          <Text style={styles.titleForcast} >{cityHistory.city2.city}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[cityHistory.city2.weatherCondition].icon} color={weatherConditions[cityHistory.city2.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{cityHistory.city2.temperature}˚C</Text>
+          </View>
+          <Text style={styles.infosubtitleText}>{cityHistory.city2.windSpeed} km/p</Text>
+          <Text style={styles.subtitleForecast}>{cityHistory.city2.weatherDescription}</Text>
 
 
+          <Text style={styles.titleForcast} >{cityHistory.city3.city}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[cityHistory.city3.weatherCondition].icon} color={weatherConditions[cityHistory.city3.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{cityHistory.city3.temperature}˚C</Text>
+          </View>
+          <Text style={styles.infosubtitleText}>{cityHistory.city3.windSpeed} km/p</Text>
+          <Text style={styles.subtitleForecast}>{cityHistory.city3.weatherDescription}</Text>
+
+          <Text style={styles.titleForcast} >{cityHistory.city4.city}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[cityHistory.city4.weatherCondition].icon} color={weatherConditions[cityHistory.city4.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{cityHistory.city4.temperature}˚C</Text>
+          </View>
+          <Text style={styles.infosubtitleText}>{cityHistory.city4.windSpeed} km/p</Text>
+          <Text style={styles.subtitleForecast}>{cityHistory.city4.weatherDescription}</Text>
+
+          <Text style={styles.titleForcast} >{cityHistory.city5.city}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[cityHistory.city5.weatherCondition].icon} color={weatherConditions[cityHistory.city5.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{cityHistory.city5.temperature}˚C</Text>
+          </View>
+          <Text style={styles.infosubtitleText}>{cityHistory.city5.windSpeed} km/p</Text>
+          <Text style={styles.subtitleForecast}>{cityHistory.city5.weatherDescription}</Text>
+
+          <Text style={styles.titleForcast} >{cityHistory.city6.city}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[cityHistory.city6.weatherCondition].icon} color={weatherConditions[cityHistory.city6.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{cityHistory.city6.temperature}˚C</Text>
+          </View>
+          <Text style={styles.infosubtitleText}>{cityHistory.city6.windSpeed} km/p</Text>
+          <Text style={styles.subtitleForecast}>{cityHistory.city6.weatherDescription}</Text>
+
+          <Text style={styles.titleForcast} >{cityHistory.city7.city}</Text>
+          <View style={{flexDirection: 'row'}}>
+            <MaterialCommunityIcons size={60} name={weatherConditions[cityHistory.city7.weatherCondition].icon} color={weatherConditions[cityHistory.city7.weatherCondition].color}/>
+            <Text style={styles.subtitle}>{cityHistory.city7.temperature}˚C</Text>
+          </View>
+          <Text style={styles.infosubtitleText}>{cityHistory.city7.windSpeed} km/p</Text>
+          <Text style={styles.subtitleForecast}>{cityHistory.city7.weatherDescription}</Text>
+
+        </View>
+      </View>
+      </View>
 
   );
 };
@@ -298,7 +462,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   appHeading: {
-    fontSize: 48,
+    fontSize: 38,
+    marginTop:7,
+    marginBottom:7,
     color: '#fff'
   },
 
@@ -320,7 +486,6 @@ const styles = StyleSheet.create({
     flex: 2,
     alignItems: 'center',
     justifyContent: 'flex-end',
-    marginBottom: 40
   },
 
   bodyForecastContainer: {
