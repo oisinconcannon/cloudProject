@@ -73,7 +73,7 @@ function CurrentWeather({ navigation, route })
       let weatherData =
       {
         city:city,
-        temp: Math.round((json.main.feels_like) - 273.15),
+        temp: Math.round((json.main.temp) - 273.15),
         windspeed: Math.round(json.wind.speed),
         weatherdescription: json.weather[0].description,
         weatherCondition: json.weather[0].main
@@ -158,7 +158,7 @@ if(x==1){
     let weatherData =
     {
       city:city,
-      temp: Math.round((json.main.feels_like) - 273.15),
+      temp: Math.round((json.main.temp) - 273.15),
       windspeed: Math.round(json.wind.speed),
       weatherdescription: json.weather[0].description,
       weatherCondition: json.weather[0].main
@@ -524,51 +524,6 @@ const styles = StyleSheet.create({
 });
 
 
-function ChartTheData({ navigation, route })
-{
-//  if(route.params.show == false){
-  //  return null;
-  //}
-  let lineData =
-  {
-    interpolation: 'T', data: [10, 12, 8, 9, 10, 5, 0, -5],
-    nativeData:
-    {
-      labels: ["Mon", "Tue", "Wed", "Thurs", "Fri", "Sat","Sun"],
-      datasets:
-      [{
-      data:
-        [
-          Math.random() * 90,
-          Math.random() * 100,
-          Math.random() * 100,
-          Math.random() * 100,
-          Math.random() * 100,
-          Math.random() * 100,
-          Math.random() * 100,
-          Math.random() * 100
-        ]
-      }]
-    }
-  };
-  return(
-    <View style={{ flex: 1,justifyContent: 'center', alignItems: 'center',backgroundColor: '#1e90ff',paddingBottom: 50}}>
-
-      <View style={{ backgroundColor: '#ffffff', borderColor: '#000000', borderWidth: 2, padding: 2 }}>
-        <MyChart dataToChart = {lineData}> </MyChart>
-      </View>
-
-      <View style={{ padding: 5, marginTop: 10, backgroundColor: '#c0c0c0', borderColor: '#6060ff', borderWidth: 2, borderRadius: 10, }}>
-        <Text onPress={() => navigation.goBack()}>Done (back to Home screen)</Text>
-      </View>
-
-    </View>
-  );
-}
-
-
-
-
 const Stack = createStackNavigator();
 export default function App()
 {
@@ -592,23 +547,6 @@ export default function App()
           }}
         />
 
-
-        <Stack.Screen
-          name="ChartTheData"
-          component={ChartTheData}
-          options={{
-            title: 'Chart',
-            backgroundColor: '#1e90ff',
-            headerStyle: {
-              backgroundColor: '#000080',
-              height: 50,
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            }
-          }}
-        />
         <Stack.Screen
           name="SearchHistory"
           component={SearchHistory}
