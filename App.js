@@ -44,11 +44,8 @@ function HomeScreen({ navigation, route })
             <Text style ={{fontSize:20, color: '#fff'}} onPress={() => navigation.navigate('ForecastWeather',{ paramKey:text})}
             >Search Forecast</Text>
           </View>
-          <View style={{ padding: 10, backgroundColor: '#570091', marginBottom: 10, marginTop: 10, borderColor: '#570091', borderWidth: 3, borderRadius: 10}} >
-            <Text style ={{fontSize:20, color: '#fff'}} onPress={() =>navigation.navigate('SearchHistory')}
-            >Search History</Text>
-          </View>
         </View>
+        <Text style ={{fontSize:20, color: '#fff', marginBottom: 30}} onPress={() =>navigation.navigate('SearchHistory')}>Search History</Text>
       </View>
     </View>
   );
@@ -58,7 +55,7 @@ function CurrentWeather({ navigation, route })
 {
   x++;
   const [weather, setWeather] = React.useState({ weatherCondition: "Clear", temperature: "", feelsliketemperature: "", pressure: "",
-        humidity: "", windDirection: "", windSpeed: "", weatherDescription: ""});
+        humidity: "", windDirection: "", windSpeed: "", weatherDescription: "",sunRise: "", sunSet: "", visibility: ""});
   const [city, setCity] = React.useState(route.params.paramKey);
 
   if(x==1){
@@ -66,16 +63,29 @@ function CurrentWeather({ navigation, route })
     .then((response) => response.json())
     .then((json) =>
     {
+
       setWeather({
                   weatherCondition: json.weather[0].main,
                   temperature: Math.round((json.main.temp) - 273.15),
                   feelsliketemperature: Math.round((json.main.feels_like) - 273.15),
                   pressure: json.main.pressure,
                   humidity: json.main.humidity,
-                  windDirection: json.wind.deg + 90 + 'deg',
+                  windDirection: json.wind.deg + 90,
                   windSpeed: Math.round(json.wind.speed),
-                  weatherDescription: json.weather[0].description})
+                  weatherDescription: json.weather[0].description,
+                  sunRise:  (json.sys.sunrise) + (json.timezone),
+                  sunSet:  (json.sys.sunset) + (json.timezone),
+                  visibility: Math.round((json.visibility) / 1000)
+                })
 
+
+
+
+
+      console.log(dateSunRise);
+      console.log(dateSunSet);
+      console.log(weather.sunSet);
+      console.log(weather.sunRise);
       let weatherData =
       {
         city:city,
@@ -85,7 +95,7 @@ function CurrentWeather({ navigation, route })
         weatherCondition: json.weather[0].main
       }
 
-      fetch('http://192.168.1.17:8000/saveWeather/',
+      fetch('http://54.90.0.126:8000/saveWeather/',
       {
           method: 'POST',
           headers: {
@@ -100,7 +110,8 @@ function CurrentWeather({ navigation, route })
 }
 
 
-
+let dateSunRise = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).format(weather.sunRise*1000)//9:27:16 PM
+let dateSunSet = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }).format(weather.sunSet*1000)//9:27:16 PM
 
   return(
       <View style={[styles.weatherContainer,{ backgroundColor: weatherConditions[weather.weatherCondition].color }]}>
@@ -116,11 +127,21 @@ function CurrentWeather({ navigation, route })
               <Text style={styles.infosubtitleText}>{weather.feelsliketemperature}˚C</Text>
               <Text style={styles.infoHeadingText}>Wind</Text>
               <Text style={styles.infosubtitleText}>{weather.windSpeed} km/p</Text>
-              <MaterialCommunityIcons size={50} name='rewind-outline'   style={{transform: [{ rotate: weather.windDirection }]}} color={'#fff'}/>
+              <MaterialCommunityIcons size={50} name='rewind-outline'   style={{transform: [{ rotate: weather.windDirection + 'deg' }]}} color={'#fff'}/>
               <Text style={styles.infoHeadingText}>Humidity</Text>
               <Text style={styles.infosubtitleText}> {weather.humidity}%</Text>
               <Text style={styles.infoHeadingText}>Pressure</Text>
               <Text style={styles.infosubtitleText}>{weather.pressure} hPa</Text>
+              <Text style={styles.infoHeadingText}>Visibility</Text>
+              <Text style={styles.infosubtitleText}>{weather.visibility} KM</Text>
+              <View style={{flexDirection: 'row'}}>
+                <MaterialCommunityIcons size={60} name={'weather-sunset-up'} color={'#FF8C00'}/>
+                <Text style={styles.subtitle}>{dateSunRise}</Text>
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <MaterialCommunityIcons size={60} name={'weather-sunset-down'} color={'#624c73'}/>
+                <Text style={styles.subtitle}>{dateSunSet}</Text>
+              </View>
             </View>
         </View>
         </ScrollView>
@@ -129,7 +150,6 @@ function CurrentWeather({ navigation, route })
           <Text style={styles.subtitle}>{weather.weatherDescription}</Text>
         </View>
         </View>
-
     );
 };
 
@@ -170,7 +190,7 @@ if(x==1){
       weatherCondition: json.weather[0].main
     }
 
-    fetch('http://192.168.1.17:8000/saveWeather/',
+    fetch('http://54.90.0.126:8000/saveWeather/',
     {
         method: 'POST',
         headers: {
@@ -246,7 +266,7 @@ console.log(forecast);
 
         <View style = {{justifyContent: 'center'}, {alignItems: 'center'}}>
           <Text style={styles.appHeading}>{city}</Text>
-    </View>
+        </View>
         <ScrollView>
         <View style={styles.bodyContainer}>
 
@@ -324,7 +344,7 @@ function SearchHistory({ navigation, route })
                                         city7: {city: "", weatherCondition: "Clear", temperature: "", weatherDescription: "" , windSpeed: ""}
                                       });
 
-    fetch('http://192.168.1.17:8000/getHistory/', {
+    fetch('http://54.90.0.126:8000/getHistory/', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
